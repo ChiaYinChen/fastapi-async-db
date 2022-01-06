@@ -1,7 +1,7 @@
 """Main app."""
 from fastapi import FastAPI
 
-from .api import hello
+from .api import hello, user
 from .db.base_class import metadata
 from .db.session import database, engine
 
@@ -21,3 +21,4 @@ async def shutdown():
 
 
 app.include_router(hello.router)
+app.include_router(user.router, prefix="/users", tags=["users"])
