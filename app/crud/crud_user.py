@@ -1,6 +1,7 @@
 """CRUD for user."""
 from typing import Any, Dict, Union
 
+from ..core.security import get_password_hash, verify_password
 from ..db.session import database
 from ..models.user import user as UserModel
 from ..schemas.user import UserCreate, UserInDB, UserUpdate
@@ -23,7 +24,8 @@ class CRUDUser:
     @classmethod
     async def create(cls, *, obj_in: UserCreate):
         """Create user by username, email and password."""
-        user_in_db = UserInDB(**obj_in.dict(), hashed_password=obj_in.password)
+        hashed_password = get_password_hash(obj_in.password)
+        user_in_db = UserInDB(**obj_in.dict(), hashed_password=hashed_password)
         query = UserModel.insert().values(**user_in_db.dict())
         return await database.execute(query=query)
 
@@ -40,7 +42,7 @@ class CRUDUser:
         else:
             update_data = obj_in.dict(exclude_unset=True)
         if update_data.get("password"):
-            hashed_password = update_data["password"]
+            hashed_password = get_password_hash(update_data["password"])
             del update_data["password"]
             update_data["hashed_password"] = hashed_password
         query = (
@@ -56,3 +58,17 @@ class CRUDUser:
         """Delete user."""
         query = UserModel.delete().where(email == UserModel.c.email)
         return await database.execute(query=query)
+
+    @staticmethod
+    async def authenticate(
+        *,
+        email: str,
+        password: str
+    ):
+        """Authenticate a user."""
+        user = await CRUDUser.get_by_email(email=email)
+        if not user:
+            return None
+        if not verify_password(password, user.hashed_password):
+            return None
+        return user
