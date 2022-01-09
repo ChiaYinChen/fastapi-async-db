@@ -6,7 +6,10 @@ from fastapi.security import OAuth2PasswordRequestForm
 
 from ..core.security import create_access_token
 from ..crud.crud_user import CRUDUser
+from ..dependencies import get_current_user
+from ..models.user import user as UserModel
 from ..schemas.token import Token
+from ..schemas.user import User
 
 router = APIRouter()
 
@@ -27,3 +30,13 @@ async def login_access_token(
         "access_token": create_access_token(sub=user.email),
         "token_type": "bearer",
     }
+
+
+@router.post("/login/test-token", response_model=User)
+async def test_token(
+    current_user: UserModel = Depends(get_current_user)
+) -> Any:
+    """
+    Test access token.
+    """
+    return current_user
