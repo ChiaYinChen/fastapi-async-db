@@ -1,13 +1,23 @@
 """Router for user."""
 from typing import Any, List
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import JSONResponse
 
 from ..crud.crud_user import CRUDUser
+from ..dependencies import get_current_active_user
+from ..models.user import user as UserModel
 from ..schemas.user import User, UserCreate, UserUpdate
 
 router = APIRouter()
+
+
+@router.get("/me", response_model=User)
+async def get_user_me(
+    current_user: UserModel = Depends(get_current_active_user)
+) -> Any:
+    """Get the current logged in user."""
+    return current_user
 
 
 @router.get("/", response_model=List[User])
