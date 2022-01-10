@@ -37,3 +37,13 @@ async def get_current_active_user(
     if not CRUDUser.is_active(current_user):
         raise HTTPException(status_code=401, detail="Inactive user")
     return current_user
+
+
+async def get_current_active_superuser(
+    current_user: UserModel = Depends(get_current_user),
+):
+    if not CRUDUser.is_superuser(current_user):
+        raise HTTPException(
+            status_code=401, detail="The user doesn't have enough privileges"
+        )
+    return current_user
