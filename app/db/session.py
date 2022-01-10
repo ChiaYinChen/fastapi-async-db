@@ -1,12 +1,12 @@
 from databases import Database
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, MetaData
 
-# databases query builder
 SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
 database = Database(SQLALCHEMY_DATABASE_URL)
+metadata = MetaData()
 
-# SQLAlchemy
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL,
-    connect_args={"check_same_thread": False}
+    connect_args={"check_same_thread": False},
+    echo=True
 )

@@ -3,7 +3,7 @@ from typing import Any, Dict, Union
 
 from ..core.security import get_password_hash, verify_password
 from ..db.session import database
-from ..models.user import user as UserModel
+from ..models.user import User as UserModel
 from ..schemas.user import UserCreate, UserInDB, UserUpdate
 
 
