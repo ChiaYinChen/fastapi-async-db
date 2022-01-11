@@ -6,7 +6,7 @@ from pydantic import ValidationError
 
 from .core.config import settings
 from .crud.crud_user import CRUDUser
-from .models.user import user as UserModel
+from .models.user import User as UserModel
 from .schemas.token import TokenPayload
 
 reusable_oauth2 = OAuth2PasswordBearer(tokenUrl="login/access-token")

@@ -1,41 +1,44 @@
 """CRUD for user."""
-from typing import Any, Dict, Union
+from typing import Any, Dict, List, Optional, Union
 
 from ..core.security import get_password_hash, verify_password
-from ..db.session import database
-from ..models.user import user as UserModel
+from ..models.user import User as UserModel
 from ..schemas.user import UserCreate, UserInDB, UserUpdate
 
 
 class CRUDUser:
 
     @classmethod
-    async def get_multi(cls, *, skip: int = 0, limit: int = 100):
+    async def get_multi(
+        cls, *, skip: int = 0, limit: int = 100
+    ) -> List[UserModel]:
         """Filter user list using skip and limit parameters."""
-        query = UserModel.select().offset(skip).limit(limit)
-        return await database.fetch_all(query=query)
+        return await UserModel.objects.offset(skip).limit(limit).all()
 
     @classmethod
-    async def get_by_email(cls, *, email: str):
+    async def get_by_email(
+        cls, *, email: str
+    ) -> Optional[UserModel]:
         """Get user by email."""
-        query = UserModel.select().where(email == UserModel.c.email)
-        return await database.fetch_one(query=query)
+        return await UserModel.objects.filter(email=email).get_or_none()
 
     @classmethod
-    async def create(cls, *, obj_in: UserCreate):
+    async def create(
+        cls, *, obj_in: UserCreate
+    ) -> UserModel:
         """Create user by username, email and password."""
         hashed_password = get_password_hash(obj_in.password)
         user_in_db = UserInDB(**obj_in.dict(), hashed_password=hashed_password)
-        query = UserModel.insert().values(**user_in_db.dict())
-        return await database.execute(query=query)
+        db_obj = UserModel(**user_in_db.dict())
+        return await db_obj.save()
 
     @classmethod
     async def update(
         cls,
         *,
-        email: str,
+        db_obj: UserModel,
         obj_in: Union[UserUpdate, Dict[str, Any]]
-    ):
+    ) -> UserModel:
         """Update user."""
         if isinstance(obj_in, dict):
             update_data = obj_in
@@ -45,26 +48,22 @@ class CRUDUser:
             hashed_password = get_password_hash(update_data["password"])
             del update_data["password"]
             update_data["hashed_password"] = hashed_password
-        query = (
-            UserModel
-            .update()
-            .where(email == UserModel.c.email)
-            .values(**update_data)
-        )
-        return await database.execute(query=query)
+        return await db_obj.update(**update_data)
 
     @classmethod
-    async def remove(cls, *, email: str):
+    async def remove(
+        cls, *, db_obj: UserModel
+    ) -> UserModel:
         """Delete user."""
-        query = UserModel.delete().where(email == UserModel.c.email)
-        return await database.execute(query=query)
+        await db_obj.delete()
+        return db_obj
 
     @staticmethod
     async def authenticate(
         *,
         email: str,
         password: str
-    ):
+    ) -> Optional[UserModel]:
         """Authenticate a user."""
         user = await CRUDUser.get_by_email(email=email)
         if not user:

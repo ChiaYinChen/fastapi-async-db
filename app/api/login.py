@@ -7,7 +7,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from ..core.security import create_access_token
 from ..crud.crud_user import CRUDUser
 from ..dependencies import get_current_user
-from ..models.user import user as UserModel
+from ..models.user import User as UserModel
 from ..schemas.token import Token
 from ..schemas.user import User
 
