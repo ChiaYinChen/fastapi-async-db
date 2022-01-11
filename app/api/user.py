@@ -6,7 +6,7 @@ from fastapi.responses import JSONResponse
 
 from ..crud.crud_user import CRUDUser
 from ..dependencies import get_current_active_user
-from ..models.user import user as UserModel
+from ..models.user import User as UserModel
 from ..schemas.user import User, UserCreate, UserUpdate
 
 router = APIRouter()
@@ -52,11 +52,10 @@ async def create_user(
             status_code=400,
             content={"message": "User already exist"}
         )
-    user_id = await CRUDUser.create(obj_in=user_in)
-    return User(**user_in.dict(), user_id=user_id)
+    return await CRUDUser.create(obj_in=user_in)
 
 
-@router.patch("/{email}")
+@router.patch("/{email}", response_model=User)
 async def update_user(
     email: str,
     user_in: UserUpdate,
@@ -65,11 +64,7 @@ async def update_user(
     db_user = await CRUDUser.get_by_email(email=email)
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
-    await CRUDUser.update(email=email, obj_in=user_in)
-    return JSONResponse(
-        status_code=200,
-        content={"message": "Updated user success"}
-    )
+    return await CRUDUser.update(db_obj=db_user, obj_in=user_in)
 
 
 @router.delete("/{email}")
@@ -80,8 +75,8 @@ async def delete_user(
     db_user = await CRUDUser.get_by_email(email=email)
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
-    await CRUDUser.remove(email=email)
+    removed_user = await CRUDUser.remove(db_obj=db_user)
     return JSONResponse(
         status_code=200,
-        content={"message": f"Deleted user {db_user.email}"}
+        content={"message": f"Deleted user {removed_user.email}"}
     )
