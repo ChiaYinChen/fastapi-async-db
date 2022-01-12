@@ -8,5 +8,6 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
 
+    SQLALCHEMY_DATABASE_URI: str = "sqlite:///./test.db"
 
 settings = Settings()
