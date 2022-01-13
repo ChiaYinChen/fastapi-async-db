@@ -76,3 +76,8 @@ class CRUDUser:
     def is_active(user: UserModel) -> bool:
         """Check if user is active."""
         return user.is_active
+
+    @staticmethod
+    def is_superuser(user: UserModel) -> bool:
+        """Check if user is superuser."""
+        return user.is_superuser
