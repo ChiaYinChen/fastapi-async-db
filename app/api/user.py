@@ -5,7 +5,10 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import JSONResponse
 
 from ..crud.crud_user import CRUDUser
-from ..dependencies import get_current_active_user
+from ..dependencies import (
+    get_current_active_superuser,
+    get_current_active_user
+)
 from ..models.user import User as UserModel
 from ..schemas.user import User, UserCreate, UserUpdate
 
@@ -24,6 +27,7 @@ async def get_user_me(
 async def get_users(
     skip: int = 0,
     limit: int = 100,
+    current_user: UserModel = Depends(get_current_active_superuser),
 ) -> Any:
     """Get user list."""
     users = CRUDUser.get_multi(skip=skip, limit=limit)
