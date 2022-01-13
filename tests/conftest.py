@@ -1,11 +1,13 @@
 """Pytest's conftest.py."""
 from asyncio import get_event_loop
-from typing import Generator
+from typing import Dict, Generator
 
 import pytest
 from httpx import AsyncClient
 
+from app.core.config import settings
 from app.main import app
+from tests.utils.user import authentication_token_from_email
 
 
 @pytest.fixture(scope="module")
@@ -19,3 +21,14 @@ async def client() -> Generator:
 def event_loop():
     loop = get_event_loop()
     yield loop
+
+
+@pytest.fixture(scope="module")
+async def normal_user_token_headers(
+    client: AsyncClient
+) -> Dict[str, str]:
+    """Token headers for normal user."""
+    return await authentication_token_from_email(
+        client=client,
+        email=settings.TEST_USER_EMAIL
+    )
