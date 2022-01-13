@@ -14,6 +14,8 @@ class Settings(BaseSettings):
     TEST_SQLALCHEMY_DATABASE_URI: str = "sqlite:///./test.db"
     TEST_USER_EMAIL: str = "test@example.com"
     TEST_USER_PASSWORD: str = "testuserpass"
+    FIRST_SUPERUSER_EMAIL: str = "testsuper@example.com"
+    FIRST_SUPERUSER_PASSWORD: str = "superuserpass"
 
     class Config:
         env_file = ".env"
