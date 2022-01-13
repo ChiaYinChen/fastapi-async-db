@@ -7,7 +7,8 @@ from httpx import AsyncClient
 
 from app.core.config import settings
 from app.main import app
-from tests.utils.user import authentication_token_from_email
+from tests.utils.user import (authentication_token_from_email,
+                              user_authentication_headers)
 
 
 @pytest.fixture(scope="module")
@@ -31,4 +32,16 @@ async def normal_user_token_headers(
     return await authentication_token_from_email(
         client=client,
         email=settings.TEST_USER_EMAIL
+    )
+
+
+@pytest.fixture(scope="module")
+async def superuser_token_headers(
+    client: AsyncClient
+) -> Dict[str, str]:
+    """Token headers for superuser."""
+    return await user_authentication_headers(
+        client=client,
+        email=settings.FIRST_SUPERUSER_EMAIL,
+        password=settings.FIRST_SUPERUSER_PASSWORD
     )
