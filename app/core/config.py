@@ -1,4 +1,7 @@
 """Settings."""
+import logging.config
+from os.path import abspath, dirname, join
+
 from pydantic import BaseSettings
 
 
@@ -23,3 +26,8 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+
+# logging setting
+PROJ_ROOT = dirname(dirname(dirname(abspath(__file__))))
+LOG_FILE_PATH = join(PROJ_ROOT, "app", "logging.conf")
+logging.config.fileConfig(LOG_FILE_PATH)

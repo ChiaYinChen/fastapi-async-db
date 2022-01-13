@@ -6,3 +6,4 @@ passlib[bcrypt]==1.7.4
 python-multipart==0.0.5
 ormar[sqlite]==0.10.23
 python-dotenv==0.19.2
+colorlog==6.6.0
