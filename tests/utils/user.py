@@ -1,7 +1,6 @@
 """Util function for unit test."""
 from typing import Dict
 
-import pytest
 from httpx import AsyncClient
 
 from app.core.config import settings
@@ -9,7 +8,6 @@ from app.crud.crud_user import CRUDUser
 from app.schemas.user import UserCreate, UserUpdate
 
 
-@pytest.mark.asyncio
 async def user_authentication_headers(
     client: AsyncClient, email: str, password: str
 ) -> Dict[str, str]:
