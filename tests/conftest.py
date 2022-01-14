@@ -9,8 +9,7 @@ from httpx import AsyncClient
 from app import color_formatter
 from app.core.config import settings
 from app.main import app
-from tests.utils.user import (authentication_token_from_email,
-                              user_authentication_headers)
+from tests.utils.user import authentication_token_from_email
 
 
 @pytest.fixture(scope="module")
@@ -26,26 +25,28 @@ def event_loop():
     yield loop
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="module", autouse=True)
 async def normal_user_token_headers(
     client: AsyncClient
 ) -> Dict[str, str]:
     """Token headers for normal user."""
     return await authentication_token_from_email(
         client=client,
-        email=settings.TEST_USER_EMAIL
+        email=settings.TEST_USER_EMAIL,
+        password=settings.TEST_USER_PASSWORD
     )
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="module", autouse=True)
 async def superuser_token_headers(
     client: AsyncClient
 ) -> Dict[str, str]:
     """Token headers for superuser."""
-    return await user_authentication_headers(
+    return await authentication_token_from_email(
         client=client,
         email=settings.FIRST_SUPERUSER_EMAIL,
-        password=settings.FIRST_SUPERUSER_PASSWORD
+        password=settings.FIRST_SUPERUSER_PASSWORD,
+        superuser=True
     )
 
 
