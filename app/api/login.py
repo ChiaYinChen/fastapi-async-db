@@ -1,7 +1,7 @@
 """Router for login."""
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Response
 from fastapi.security import OAuth2PasswordRequestForm
 
 from ..core.security import create_access_token
@@ -16,6 +16,7 @@ router = APIRouter()
 
 @router.post("/login/access-token", response_model=Token)
 async def login_access_token(
+    response: Response,
     form_data: OAuth2PasswordRequestForm = Depends()
 ) -> Any:
     """
@@ -26,10 +27,13 @@ async def login_access_token(
     )
     if not user:
         raise HTTPException(status_code=401, detail="Incorrect username or password")  # noqa: E501
-    return {
-        "access_token": create_access_token(sub=user.email),
-        "token_type": "bearer",
-    }
+    elif not CRUDUser.is_active(user):
+        raise HTTPException(status_code=403, detail="Inactive user")
+    access_token = create_access_token(sub=user.email)
+    response.set_cookie(
+        key="access_token", value=f"Bearer {access_token}", httponly=True
+    )
+    return {"access_token": access_token, "token_type": "bearer"}
 
 
 @router.post("/login/test-token", response_model=User)

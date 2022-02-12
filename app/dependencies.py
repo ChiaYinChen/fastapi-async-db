@@ -1,6 +1,5 @@
 """Dependencies."""
 from fastapi import Depends, HTTPException
-from fastapi.security import OAuth2PasswordBearer
 from jose import jwt
 from pydantic import ValidationError
 
@@ -8,8 +7,9 @@ from .core.config import settings
 from .crud.crud_user import CRUDUser
 from .models.user import User as UserModel
 from .schemas.token import TokenPayload
+from .utils import OAuth2PasswordBearerCookie
 
-reusable_oauth2 = OAuth2PasswordBearer(tokenUrl="login/access-token")
+reusable_oauth2 = OAuth2PasswordBearerCookie(tokenUrl="login/access-token")
 
 
 async def get_current_user(
