@@ -4,16 +4,16 @@ Developing and Testing an Asynchronous API with FastAPI, including interactive A
 
 ## Installation
 
-Install requirements
+Install both production and development packages
 
 ```
-$ pip install -r requirements/prod.txt
+$ poetry install
 ```
 
-Install requirements for developing packages
+Install production packages
 
 ```
-$ pip install -r requirements/dev.txt
+$ poetry install --no-dev
 ```
 
 ## Local development
